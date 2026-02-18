@@ -34,8 +34,9 @@ function renderProducts(products){
                     </p>
                     <p class="card-price mt-auto fw-bold">₹${product['product-price']}</p>
                     <div class="d-flex">
-                        <button type="button" class="btn btn-warning me-2" onclick="updateProduct(${product['product-id']})">Edit</button>
-                        <button type="button" class="btn btn-danger ms-2" onclick="deleteProduct(${product['product-id']})">Delete</button>
+                        <button type="button" class="btn btn-secondary me-1" onclick="viewProduct(${product['product-id']})">View</button>
+                        <button type="button" class="btn btn-warning me-1" onclick="updateProduct(${product['product-id']})">Edit</button>
+                        <button type="button" class="btn btn-danger" onclick="deleteProduct(${product['product-id']})">Delete</button>
                     </div>
                 </div>
             </div>
@@ -159,25 +160,37 @@ function editThisProduct(product_id){
     qs.innerHTML=addProductHTML;
 }
 
+function viewProduct(product_id){
+    localStorage.setItem("view-data",JSON.stringify(product_id));
+    window.open("view.html", "_blank")
+}
+
 function filterSearch(){
     let filter_bar=document.getElementById("filter");
+    let timer=null;
     filter_bar.addEventListener("input", ()=>{
-        let filter=document.getElementById("filter").value.trim().toLowerCase();
-        let product_list=getProducts();
-        product_list = product_list.filter(product=>{
-            let name=product['product-name'].toLowerCase();
-            let price=product['product-price'].toLowerCase();
-            let id=product['product-id'];
-            let desc=product['product-desc'].toLowerCase();
-            console.log(name, id, desc, price);
-            if(name.includes(filter)||id.toString().includes(filter)||price.includes(filter)||desc.includes(filter)){
-                console.log(true);
-                return true;
-            }
-            return false;
-        });
-        console.log(product_list);
-        renderProducts(product_list);
+        if(timer!=null){
+            clearTimeout(timer);
+            timer=null;
+        }
+        timer=setTimeout(()=>{
+            let filter=document.getElementById("filter").value.trim().toLowerCase();
+            let product_list=getProducts();
+            product_list = product_list.filter(product=>{
+                let name=product['product-name'].toLowerCase();
+                let price=product['product-price'].toLowerCase();
+                let id=product['product-id'];
+                let desc=product['product-desc'].toLowerCase();
+                console.log(name, id, desc, price);
+                if(name.includes(filter)||id.toString().includes(filter)||price.includes(filter)||desc.includes(filter)){
+                    console.log(true);
+                    return true;
+                }
+                return false;
+            });
+            console.log(product_list);
+            renderProducts(product_list);
+        },200)
     })
 }
 

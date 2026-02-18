@@ -16,8 +16,8 @@ function getProducts(){
     }
 }
 
-function renderProducts(){
-    let product_list=getProducts();
+function renderProducts(products){
+    let product_list=products||getProducts();
     let productHTML = document.querySelector(".products .row");
     if(!productHTML) return;
     
@@ -159,19 +159,27 @@ function editThisProduct(product_id){
     qs.innerHTML=addProductHTML;
 }
 console.log("end")
-// function filterSearch(){
-//     let filter_bar=document.getElementById("filter");
-//     let timer=null;
-//     filter_bar.addEventListener("input", (e)=>{
-//         if(timer!=null){
-//             timer=setTimeout(()=>{
-//                 let filter_text=e.target.value;
-//                 let product_list=getProducts();
-//                 product_list.filter(product=>product.includes())
-//                 timer=null;
-//             },1000)
-//         }
-//     })
-// }
 
-// filterSearch();
+function filterSearch(){
+    let filter_bar=document.getElementById("filter");
+    filter_bar.addEventListener("input", ()=>{
+        let filter=document.getElementById("filter").value.trim().toLowerCase();
+        let product_list=getProducts();
+        product_list = product_list.filter(product=>{
+            let name=product['product-name'].toLowerCase();
+            let price=product['product-price'].toLowerCase();
+            let id=product['product-id'];
+            let desc=product['product-desc'].toLowerCase();
+            console.log(name, id, desc, price);
+            if(name.includes(filter)||id.toString().includes(filter)||price.includes(filter)||desc.includes(filter)){
+                console.log(true);
+                return true;
+            }
+            return false;
+        });   
+        console.log(product_list);
+        renderProducts(product_list);
+    })
+}
+
+filterSearch();

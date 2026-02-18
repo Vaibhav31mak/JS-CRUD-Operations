@@ -190,7 +190,7 @@ function filterSearch(){
             });
             console.log(product_list);
             renderProducts(product_list);
-        },500)
+        },200)
     })
 }
 

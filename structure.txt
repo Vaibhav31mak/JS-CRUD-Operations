@@ -1,0 +1,33 @@
+<body>
+
+  ┌──────────────────────────────────────────┐
+  │ Header / Navbar                           │
+  │ ─ App Title                               │
+  │ ─ "Add Product" button                   │
+  └──────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────┐
+  │ Filter & Search Section                  │
+  │ ─ Search by Product ID input             │
+  │ ─ Sort dropdown                          │
+  │   • Product ID                           │
+  │   • Product Name                         │
+  │   • Price                                │
+  └──────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────┐
+  │ Product List Section                     │
+  │ ─ Table / Cards                          │
+  │   • Product ID                           │
+  │   • Product Name                         │
+  │   • Image                                │
+  │   • Price                                │
+  │   • Description                          │
+  │   • Actions (View | Edit | Delete)       │
+  └──────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────┐
+  │ Footer (optional)                        │
+  └──────────────────────────────────────────┘
+
+</body>

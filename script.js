@@ -1,3 +1,4 @@
+var addProductHTML=document.querySelector('.create-product').innerHTML;
 function getProducts(){
     try {
         let product_list = localStorage.getItem("product-list");
@@ -23,7 +24,7 @@ function renderProducts(){
         productHTML.innerHTML+=`
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card h-100">
-                <img src="./images/" class="card-img-top product-img" alt="Product image">
+                <img src="./images/product.webp" class="card-img-top product-img" alt="Product image">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${product['product-name']}</h5>
                     <p class="card-text">
@@ -31,8 +32,8 @@ function renderProducts(){
                     </p>
                     <p class="card-price mt-auto fw-bold">₹${product['product-price']}</p>
                     <div class="d-flex">
-                        <button class="btn btn-warning me-2" onclick="updateProduct(${product['product_id']})">Edit</button>
-                        <button class="btn btn-danger ms-2" onclick="deleteProduct(${product['product_id']})">Delete</button>
+                        <button type="button" class="btn btn-warning me-2" onclick="updateProduct(${product['product-id']})">Edit</button>
+                        <button type="button" class="btn btn-danger ms-2" onclick="deleteProduct(${product['product-id']})">Delete</button>
                     </div>
                 </div>
             </div>
@@ -41,7 +42,12 @@ function renderProducts(){
     });
 }
 
-function addProduct(){
+function addToLocalStorage(product_list){
+    localStorage.setItem("product-list",JSON.stringify(product_list));
+    renderProducts();
+}
+
+function addProduct(product_id){
     let validations = 0;
     product_name = document.getElementById("product-name");
     if(product_name.value.trim().length < 3){
@@ -86,11 +92,67 @@ function addProduct(){
     //     console.log(product_list);
     // };
     // reader.readAsDataURL(file);
-
     let product_list=getProducts();
-    product_list.push({"product-id": Date.now() ,"product-name": product_name.value, "product-price": product_price.value, "product-desc": product_desc.value});
-    localStorage.setItem("product-list",JSON.stringify(product_list));
-    renderProducts();
+    product_list.push({"product-id": (product_id||Date.now()) ,"product-name": product_name.value, "product-price": product_price.value, "product-desc": product_desc.value});
+    addToLocalStorage(product_list);
+    product_name.value="";
+    product_price.value="";
+    product_desc.value="";
 }
 
 renderProducts();
+
+function deleteProduct(product_id){
+    console.log("delete "+ product_id);
+    let product_list=getProducts();
+    console.log(product_list);
+    product_list=product_list.filter(product=>product['product-id']!=product_id);
+    console.log(product_list);
+    addToLocalStorage(product_list);
+}
+
+function updateProduct(product_id){
+    console.log(product_id);
+    let product_list=getProducts();
+    const product = product_list.find(product => product['product-id'] == product_id);
+    console.log(product);
+    let qs=document.querySelector(".create-product")
+    let productHTML=qs.innerHTML;
+    console.log(productHTML);
+    qs.innerHTML=`
+                <div class="row">
+                    <div class="col-12 col-sm-4 form-group mb-2">
+                        <input type="text" id="product-name" class="form-control" placeholder="Product Name" value=${product['product-name']}>
+                        <p id="validate-product-name"></p>
+                    </div>
+                    <div class="col-12 col-sm-4 form-group mb-2">
+                        <form id="uploadForm" enctype="multipart/form-data">
+                            <input type="file" id="product-image" accept="image/*" class="form-control" aria-label="Product Image">
+                        </form>
+                        <p id="validate-product-image"></p>
+                    </div>
+                    <div class="col-12 col-sm-4 form-group mb-2">
+                        <input type="number" id="product-price" class="form-control" placeholder="Product Price" value=${product['product-price']}>
+                        <p id="validate-product-price"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-8 form-group">
+                        <textarea class="form-control" id="product-desc" placeholder="Product Description">${product['product-desc']}</textarea>
+                        <p id="validate-product-desc"></p>
+                    </div>
+                    <div class="col-12 col-sm-4 col-xxl-2 mt-2 form-group">
+                        <button class="btn btn-primary form-control" onclick="editThisProduct(${product_id})"> Edit Product </button>
+                    </div>
+                </div>
+    `
+}
+
+function editThisProduct(product_id){
+    console.log("edit this product");
+    deleteProduct(product_id);
+    addProduct(product_id);
+    let qs=document.querySelector(".create-product");
+    console.log(qs.innerHTML);
+    qs.innerHTML=addProductHTML;
+}

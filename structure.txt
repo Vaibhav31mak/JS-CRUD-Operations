@@ -171,3 +171,10 @@ Commit cleanly
 Merge feature → develop
 
 After all features → merge develop → main
+
+main
+└── develop
+    |-- feature/html-setup
+    ├── feature/core-crud
+    ├── feature/filter-sort
+    └── feature/routing-validation

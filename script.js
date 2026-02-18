@@ -158,7 +158,6 @@ function editThisProduct(product_id){
     console.log(qs.innerHTML);
     qs.innerHTML=addProductHTML;
 }
-console.log("end")
 
 function filterSearch(){
     let filter_bar=document.getElementById("filter");
@@ -176,10 +175,56 @@ function filterSearch(){
                 return true;
             }
             return false;
-        });   
+        });
         console.log(product_list);
         renderProducts(product_list);
     })
 }
 
 filterSearch();
+
+function sortBy(){
+    let selectSortBy=document.getElementById("select-sort");
+    selectSortBy.addEventListener("change", (e)=>{
+        console.log("inside sortby event");
+        let sort_by=e.target.value;
+        let product_list=getProducts();
+        switch(sort_by){
+            case "":
+                break;
+            case "product-id":
+                console.log("id");
+                product_list.sort((product1,product2) => {
+                    if(product1['product-id']<product2['product-id']) return -1;
+                    if(product1['product-id']>product2['product-id']) return 1;
+                    return 0;
+                });
+                break;
+            case "product-name":
+                console.log("name");
+                product_list.sort((product1,product2) => {
+                    name1=product1['product-name'].toLowerCase();
+                    name2=product2['product-name'].toLowerCase();
+                    if(name1<name2) return -1;
+                    if(name1>name2) return 1;
+                    return 0;
+                });
+                break;
+            case "product-price":
+                console.log("price");
+                product_list.sort((product1,product2) => {
+                    return product1['product-price']-product2['product-price'];
+                });
+                break;
+            default:
+                console.log("Selection Error");
+                break;
+        }
+        console.log(product_list);
+        renderProducts(product_list);
+    })
+}
+
+sortBy();
+
+console.log("end")

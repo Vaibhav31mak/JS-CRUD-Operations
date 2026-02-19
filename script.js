@@ -20,13 +20,13 @@ function renderProducts(products){
     let product_list=products||getProducts();
     let productHTML = document.querySelector(".products .row");
     if(!productHTML) return;
-    
+    console.log(product_list);
     productHTML.innerHTML = '';
     product_list.forEach(product => {
         productHTML.innerHTML+=`
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card h-100">
-                <img src="./images/product.webp" class="card-img-top product-img" alt="Product image">
+                <img src=${product['product-image']} class="card-img-top product-img" alt="Product image">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${product['product-name']}</h5>
                     <p class="card-text">
@@ -53,54 +53,75 @@ function addToLocalStorage(product_list){
 function addProduct(product_id){
     let validations = 0;
     product_name = document.getElementById("product-name");
+    let validate_product_name=document.getElementById("validate-product-name");
     if(product_name.value.trim().length < 3){
-        let validate_product_name=document.getElementById("validate-product-name");
         validate_product_name.innerHTML="Length should be >= 3";
         validate_product_name.style.color="red";
         validations++;
     }
-    
-    // product_image = document.getElementById("product-image");
-    // if(product_image.files.length === 0){
-    //     let validate_product_image=document.getElementById("validate-product-image");
-    //     validate_product_image.innerHTML="Image is required";
-    //     validate_product_image.style.color="red";
-    //     validations++;
-    // }
+    else{
+        validate_product_name.innerHTML="";
+    }
     
     product_price = document.getElementById("product-price");
+    let validate_product_price=document.getElementById("validate-product-price");
     if(product_price.value == ""){
-        let validate_product_price=document.getElementById("validate-product-price");
+        console.log(product_price+"price")
         validate_product_price.innerHTML="Price required";
         validate_product_price.style.color="red";
         validations++;
     }
+    else{
+        validate_product_price.innerHTML="";
+    }
 
     product_desc = document.getElementById("product-desc");
+    let validate_product_desc=document.getElementById("validate-product-desc");
     if(product_desc.value.trim().length<10){
-        let validate_product_desc=document.getElementById("validate-product-desc");
         validate_product_desc.innerHTML="Length should be >= 10";
         validate_product_desc.style.color="red";
         validations++;
     }
+    else{
+        validate_product_desc.innerHTML="";
+    }
 
-    if(validations>0) return;
-
-    // let file = product_image.files[0];
-    // let reader = new FileReader();
-    // reader.onload = function(e){
-    //     let product_list=getProducts();
-    //     product_list.push({"product-name": product_name.value, "product-image": e.target.result, "product-price": product_price.value, "product-desc": product_desc.value})
-    //     localStorage.setItem("product-list", JSON.stringify(product_list));
-    //     console.log(product_list);
-    // };
-    // reader.readAsDataURL(file);
-    let product_list=getProducts();
-    product_list.push({"product-id": (product_id||Date.now()) ,"product-name": product_name.value, "product-price": product_price.value, "product-desc": product_desc.value});
-    addToLocalStorage(product_list);
-    product_name.value="";
-    product_price.value="";
-    product_desc.value="";
+    let product_image=document.getElementById('product-image');
+    let file=product_image.files[0];
+    let validate_product_image=document.getElementById("validate-product-image");
+    console.log(file);
+    if(!file){
+        console.log("in file");
+        validate_product_image.innerHTML="Image is required";
+        validate_product_image.style.color="red";
+        validations++;
+    }else if(file.size > 100 * 1024){
+        validate_product_image.innerHTML="Size should be <= 100KB";
+        validate_product_image.style.color="red";           
+        validations++;
+    }else{
+        validate_product_image.innerHTML="";
+    }
+    console.log("validations "+validations);
+    if(validations>0){
+        return;
+    }
+    let reader=new FileReader();
+    reader.onload=function(e){
+        console.log("in")
+        let product_list=getProducts();
+        console.log(product_name.value,product_price.value, product_desc.value)
+        product_list.push({"product-id": (product_id||Date.now()), "product-name": product_name.value, "product-image": e.target.result, "product-price": product_price.value, "product-desc": product_desc.value})
+        addToLocalStorage(product_list);
+        clearValues();
+    }
+    reader.readAsDataURL(file);
+    function clearValues(){
+        product_name.value="";
+        product_price.value="";
+        product_desc.value="";
+        product_image.value="";
+    }
 }
 
 renderProducts();

@@ -3,7 +3,7 @@ var addProductHTML=document.querySelector('.create-product').innerHTML;
 
 function showSnackbar(message) {
     var snackbar = document.getElementById("snackbar");
-    snackbar.className="show";
+    snackbar.className="bg-primary show";
     snackbar.innerHTML=message;
     setTimeout(()=>{ 
         snackbar.className = snackbar.className.replace("show", "");
@@ -34,16 +34,16 @@ function renderProducts(products){
     product_list.forEach(product => {
         productHTML.innerHTML+=`
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <div class="card h-100">
+            <div class="card h-100 product-card shadow-sm border-0">
                 <img src=${product['product-image']} class="card-img-top product-img" alt="Product image">
                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">${product['product-name']}</h5>
-                    <p class="card-text">
+                    <h5 class="card-title text-primary fw-bold">${product['product-name']}</h5>
+                    <p class="card-text text-muted small">
                         ${product['product-desc']}
                     </p>
-                    <p class="card-price mt-auto fw-bold">₹${product['product-price']}</p>
+                    <p class="card-price mt-auto fw-bold text-success">₹${product['product-price']}</p>
                     <div class="d-flex">
-                        <button type="button" class="btn btn-secondary me-1" onclick="viewProduct(${product['product-id']})">View</button>
+                        <button type="button" class="btn btn-primary me-1" onclick="viewProduct(${product['product-id']})">View</button>
                         <button type="button" class="btn btn-warning me-1" onclick="updateProduct(${product['product-id']})">Edit</button>
                         <button type="button" class="btn btn-danger" onclick="deleteProduct(${product['product-id']})">Delete</button>
                     </div>
@@ -165,6 +165,7 @@ function updateProduct(product_id){
     let productHTML=qs.innerHTML;
     console.log(productHTML);
     qs.innerHTML=`
+                <h5 class="mb-3 fw-semibold">Update Product</h5>
                 <div class="row">
                     <div class="col-12 col-sm-4 form-group mb-2">
                         <input type="text" id="product-name" class="form-control" placeholder="Product Name" value=${product['product-name']}>

@@ -55,7 +55,7 @@ function addProduct(product_id){
     product_name = document.getElementById("product-name");
     let validate_product_name=document.getElementById("validate-product-name");
     if(product_name.value.trim().length < 3){
-        validate_product_name.innerHTML="Length should be >= 3";
+        validate_product_name.innerHTML="Name is required";
         validate_product_name.style.color="red";
         validations++;
     }
@@ -67,7 +67,13 @@ function addProduct(product_id){
     let validate_product_price=document.getElementById("validate-product-price");
     if(product_price.value == ""){
         console.log(product_price+"price")
-        validate_product_price.innerHTML="Price required";
+        validate_product_price.innerHTML="Price is required";
+        validate_product_price.style.color="red";
+        validations++;
+    }
+    else if(product_price.value <= 0){
+        console.log(product_price+"price")
+        validate_product_price.innerHTML="Price should be positive";
         validate_product_price.style.color="red";
         validations++;
     }
@@ -77,8 +83,8 @@ function addProduct(product_id){
 
     product_desc = document.getElementById("product-desc");
     let validate_product_desc=document.getElementById("validate-product-desc");
-    if(product_desc.value.trim().length<10){
-        validate_product_desc.innerHTML="Length should be >= 10";
+    if(product_desc.value.trim().length<1){
+        validate_product_desc.innerHTML="Description is required";
         validate_product_desc.style.color="red";
         validations++;
     }
@@ -96,7 +102,7 @@ function addProduct(product_id){
         validate_product_image.style.color="red";
         validations++;
     }else if(file.size > 100 * 1024){
-        validate_product_image.innerHTML="Size should be <= 100KB";
+        validate_product_image.innerHTML="Size not exceed 100KB";
         validate_product_image.style.color="red";           
         validations++;
     }else{
@@ -166,7 +172,7 @@ function updateProduct(product_id){
                         <p id="validate-product-desc"></p>
                     </div>
                     <div class="col-12 col-sm-4 col-xxl-2 mt-2 form-group">
-                        <button class="btn btn-primary form-control" onclick="editThisProduct(${product_id})"> Edit Product </button>
+                        <button class="btn btn-primary form-control" onclick="editThisProduct(${product_id})"> Update Product </button>
                     </div>
                 </div>
     `

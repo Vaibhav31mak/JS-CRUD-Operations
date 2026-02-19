@@ -1,6 +1,15 @@
 console.log("start")
 var addProductHTML=document.querySelector('.create-product').innerHTML;
 
+function showSnackbar(message) {
+    var snackbar = document.getElementById("snackbar");
+    snackbar.className="show";
+    snackbar.innerHTML=message;
+    setTimeout(()=>{ 
+        snackbar.className = snackbar.className.replace("show", "");
+    }, 5000);
+}
+
 function getProducts(){
     try {
         let product_list = localStorage.getItem("product-list");
@@ -51,6 +60,7 @@ function addToLocalStorage(product_list){
 }
 
 function addProduct(product_id){
+    console.log("add product"+product_id);
     let validations = 0;
     product_name = document.getElementById("product-name");
     let validate_product_name=document.getElementById("validate-product-name");
@@ -97,7 +107,7 @@ function addProduct(product_id){
     let validate_product_image=document.getElementById("validate-product-image");
     console.log(file);
     if(!file){
-        console.log("in file");
+        console.log("no file");
         validate_product_image.innerHTML="Image is required";
         validate_product_image.style.color="red";
         validations++;
@@ -110,14 +120,16 @@ function addProduct(product_id){
     }
     console.log("validations "+validations);
     if(validations>0){
-        return;
+        console.log("validations check");
+        showSnackbar("Please ensure that all fields are filled properly.");
+        return false;
     }
     let reader=new FileReader();
     reader.onload=function(e){
         console.log("in")
         let product_list=getProducts();
         console.log(product_name.value,product_price.value, product_desc.value)
-        product_list.push({"product-id": (product_id||Date.now()), "product-name": product_name.value, "product-image": e.target.result, "product-price": product_price.value, "product-desc": product_desc.value})
+        product_list.unshift({"product-id": (product_id||Date.now()), "product-name": product_name.value, "product-image": e.target.result, "product-price": product_price.value, "product-desc": product_desc.value})
         addToLocalStorage(product_list);
         clearValues();
     }
@@ -128,6 +140,8 @@ function addProduct(product_id){
         product_desc.value="";
         product_image.value="";
     }
+    showSnackbar("Product has been added successfully...");
+    return true;
 }
 
 renderProducts();
@@ -139,6 +153,7 @@ function deleteProduct(product_id){
     product_list=product_list.filter(product=>product['product-id']!=product_id);
     console.log(product_list);
     addToLocalStorage(product_list);
+    showSnackbar("Product has been deleted successfully...")
 }
 
 function updateProduct(product_id){
@@ -167,24 +182,38 @@ function updateProduct(product_id){
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-sm-8 form-group">
+                    <div class="col-12 col-sm-12 col-lg-8 form-group">
                         <textarea class="form-control" id="product-desc" placeholder="Product Description">${product['product-desc']}</textarea>
                         <p id="validate-product-desc"></p>
                     </div>
-                    <div class="col-12 col-sm-4 col-xxl-2 mt-2 form-group">
+                    <div class="col-6 col-sm-6 col-lg-2 mt-2 form-group">
                         <button class="btn btn-primary form-control" onclick="editThisProduct(${product_id})"> Update Product </button>
+                    </div>
+                    <div class="col-6 col-sm-6 col-lg-2 mt-2 form-group">
+                        <button class="btn btn-danger form-control" onclick="cancelEdit(${product_id})"> Cancel Update </button>
                     </div>
                 </div>
     `
+    showSnackbar("Please enter fields of products above to update...")
 }
 
 function editThisProduct(product_id){
     console.log("edit this product");
     deleteProduct(product_id);
-    addProduct(product_id);
+    if(addProduct(product_id)){
+        let qs=document.querySelector(".create-product");
+        console.log(qs.innerHTML);
+        qs.innerHTML=addProductHTML;
+        showSnackbar("Product has been updated successfully...")
+    }
+}
+
+function cancelEdit(product_id){
+    console.log("cancel edit");
     let qs=document.querySelector(".create-product");
     console.log(qs.innerHTML);
     qs.innerHTML=addProductHTML;
+    showSnackbar("The product update has been cancelled...")
 }
 
 function viewProduct(product_id){
@@ -250,10 +279,16 @@ function sortBy(){
                     return 0;
                 });
                 break;
-            case "product-price":
+            case "product-price-asc":
                 console.log("price");
                 product_list.sort((product1,product2) => {
                     return product1['product-price']-product2['product-price'];
+                });
+                break;
+            case "product-price-desc":
+                console.log("price");
+                product_list.sort((product1,product2) => {
+                    return -(product1['product-price']-product2['product-price']);
                 });
                 break;
             default:

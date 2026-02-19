@@ -1,6 +1,28 @@
 console.log("start")
 var addProductHTML=document.querySelector('.create-product').innerHTML;
 
+function setValidationMessage(elementId, message){
+    const element = document.getElementById(elementId);
+    if(!element) return;
+    element.className = "text-danger small mt-1 mb-0";
+    element.textContent = message || "";
+}
+
+function clearValidationMessages(){
+    setValidationMessage("validate-product-name", "");
+    setValidationMessage("validate-product-image", "");
+    setValidationMessage("validate-product-price", "");
+    setValidationMessage("validate-product-desc", "");
+}
+
+function escapeHtmlAttribute(value){
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
 function showSnackbar(message) {
     var snackbar = document.getElementById("snackbar");
     snackbar.className="bg-primary show";
@@ -62,66 +84,56 @@ function addToLocalStorage(product_list){
 function addProduct(product_id){
     console.log("add product"+product_id);
     let validations = 0;
-    product_name = document.getElementById("product-name");
-    let validate_product_name=document.getElementById("validate-product-name");
+    const product_name = document.getElementById("product-name");
     if(product_name.value.trim().length < 3){
-        validate_product_name.innerHTML="Name is required";
-        validate_product_name.style.color="red";
+        setValidationMessage("validate-product-name", "Product name must be at least 3 characters.");
         validations++;
     }
     else{
-        validate_product_name.innerHTML="";
+        setValidationMessage("validate-product-name", "");
     }
     
-    product_price = document.getElementById("product-price");
-    let validate_product_price=document.getElementById("validate-product-price");
+    const product_price = document.getElementById("product-price");
     if(product_price.value == ""){
         console.log(product_price+"price")
-        validate_product_price.innerHTML="Price is required";
-        validate_product_price.style.color="red";
+        setValidationMessage("validate-product-price", "Product price is required.");
         validations++;
     }
     else if(product_price.value <= 0){
         console.log(product_price+"price")
-        validate_product_price.innerHTML="Price should be positive";
-        validate_product_price.style.color="red";
+        setValidationMessage("validate-product-price", "Product price must be greater than 0.");
         validations++;
     }
     else{
-        validate_product_price.innerHTML="";
+        setValidationMessage("validate-product-price", "");
     }
 
-    product_desc = document.getElementById("product-desc");
-    let validate_product_desc=document.getElementById("validate-product-desc");
+    const product_desc = document.getElementById("product-desc");
     if(product_desc.value.trim().length<1){
-        validate_product_desc.innerHTML="Description is required";
-        validate_product_desc.style.color="red";
+        setValidationMessage("validate-product-desc", "Product description is required.");
         validations++;
     }
     else{
-        validate_product_desc.innerHTML="";
+        setValidationMessage("validate-product-desc", "");
     }
 
     let product_image=document.getElementById('product-image');
     let file=product_image.files[0];
-    let validate_product_image=document.getElementById("validate-product-image");
     console.log(file);
     if(!file){
         console.log("no file");
-        validate_product_image.innerHTML="Image is required";
-        validate_product_image.style.color="red";
+        setValidationMessage("validate-product-image", "Product image is required.");
         validations++;
     }else if(file.size > 100 * 1024){
-        validate_product_image.innerHTML="Size not exceed 100KB";
-        validate_product_image.style.color="red";           
+        setValidationMessage("validate-product-image", "Image size must be 100KB or less.");
         validations++;
     }else{
-        validate_product_image.innerHTML="";
+        setValidationMessage("validate-product-image", "");
     }
     console.log("validations "+validations);
     if(validations>0){
         console.log("validations check");
-        showSnackbar("Please ensure that all fields are filled properly.");
+        showSnackbar("Please fix the highlighted validation errors.");
         return false;
     }
     let reader=new FileReader();
@@ -140,7 +152,7 @@ function addProduct(product_id){
         product_desc.value="";
         product_image.value="";
     }
-    showSnackbar("Product has been added successfully...");
+    showSnackbar("Product has been added successfully.");
     return true;
 }
 
@@ -148,12 +160,16 @@ renderProducts();
 
 function deleteProduct(product_id){
     console.log("delete "+ product_id);
+    const isConfirmed = window.confirm("Are you sure you want to delete this product?");
+    if(!isConfirmed){
+        return;
+    }
     let product_list=getProducts();
     console.log(product_list);
     product_list=product_list.filter(product=>product['product-id']!=product_id);
     console.log(product_list);
     addToLocalStorage(product_list);
-    showSnackbar("Product has been deleted successfully...")
+    showSnackbar("Product has been deleted successfully.")
 }
 
 function updateProduct(product_id){
@@ -168,7 +184,7 @@ function updateProduct(product_id){
                 <h5 class="mb-3 fw-semibold">Update Product</h5>
                 <div class="row">
                     <div class="col-12 col-sm-4 form-group mb-2">
-                        <input type="text" id="product-name" class="form-control" placeholder="Product Name" value=${product['product-name']}>
+                        <input type="text" id="product-name" class="form-control" placeholder="Product Name" value="${escapeHtmlAttribute(product['product-name'])}">
                         <p id="validate-product-name"></p>
                     </div>
                     <div class="col-12 col-sm-4 form-group mb-2">
@@ -178,7 +194,7 @@ function updateProduct(product_id){
                         <p id="validate-product-image"></p>
                     </div>
                     <div class="col-12 col-sm-4 form-group mb-2">
-                        <input type="number" id="product-price" class="form-control" placeholder="Product Price" value=${product['product-price']}>
+                        <input type="number" id="product-price" class="form-control" placeholder="Product Price" value="${escapeHtmlAttribute(product['product-price'])}">
                         <p id="validate-product-price"></p>
                     </div>
                 </div>
@@ -195,17 +211,86 @@ function updateProduct(product_id){
                     </div>
                 </div>
     `
-    showSnackbar("Please enter fields of products above to update...")
+    clearValidationMessages();
+    showSnackbar("Edit the fields and click Update Product to save changes.")
 }
 
 function editThisProduct(product_id){
     console.log("edit this product");
-    deleteProduct(product_id);
-    if(addProduct(product_id)){
+    let validations = 0;
+    const product_name = document.getElementById("product-name");
+    const product_price = document.getElementById("product-price");
+    const product_desc = document.getElementById("product-desc");
+    const product_image = document.getElementById("product-image");
+    const file = product_image.files[0];
+
+    if(product_name.value.trim().length < 3){
+        setValidationMessage("validate-product-name", "Product name must be at least 3 characters.");
+        validations++;
+    } else {
+        setValidationMessage("validate-product-name", "");
+    }
+
+    if(product_price.value == ""){
+        setValidationMessage("validate-product-price", "Product price is required.");
+        validations++;
+    } else if(product_price.value <= 0){
+        setValidationMessage("validate-product-price", "Product price must be greater than 0.");
+        validations++;
+    } else {
+        setValidationMessage("validate-product-price", "");
+    }
+
+    if(product_desc.value.trim().length < 1){
+        setValidationMessage("validate-product-desc", "Product description is required.");
+        validations++;
+    } else {
+        setValidationMessage("validate-product-desc", "");
+    }
+
+    if(file && file.size > 100 * 1024){
+        setValidationMessage("validate-product-image", "Image size must be 100KB or less.");
+        validations++;
+    } else {
+        setValidationMessage("validate-product-image", "");
+    }
+
+    if(validations > 0){
+        showSnackbar("Please fix the highlighted validation errors.");
+        return;
+    }
+
+    const product_list = getProducts();
+    const productIndex = product_list.findIndex(product => product['product-id'] == product_id);
+    if(productIndex === -1){
+        showSnackbar("Unable to update: product not found.");
+        return;
+    }
+
+    const saveUpdatedProduct = (imageData) => {
+        product_list[productIndex] = {
+            ...product_list[productIndex],
+            "product-id": product_id,
+            "product-name": product_name.value,
+            "product-image": imageData,
+            "product-price": product_price.value,
+            "product-desc": product_desc.value
+        };
+        addToLocalStorage(product_list);
         let qs=document.querySelector(".create-product");
-        console.log(qs.innerHTML);
         qs.innerHTML=addProductHTML;
-        showSnackbar("Product has been updated successfully...")
+        clearValidationMessages();
+        showSnackbar("Product has been updated successfully.");
+    };
+
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+            saveUpdatedProduct(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        saveUpdatedProduct(product_list[productIndex]['product-image']);
     }
 }
 
@@ -214,7 +299,8 @@ function cancelEdit(product_id){
     let qs=document.querySelector(".create-product");
     console.log(qs.innerHTML);
     qs.innerHTML=addProductHTML;
-    showSnackbar("The product update has been cancelled...")
+    clearValidationMessages();
+    showSnackbar("Product update cancelled. No changes were made.")
 }
 
 function viewProduct(product_id){

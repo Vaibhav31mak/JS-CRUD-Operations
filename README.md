@@ -1,7 +1,7 @@
 # Product Management System (JavaScript CRUD App)
 
 ## Overview
-This is a **Product Management System** built using **Vanilla JavaScript**, HTML, and CSS.  
+This is a **Product Management System** built using **Vanilla JavaScript**, HTML, CSS and Bootstrap.  
 The application allows users to manage products with full CRUD functionality, filtering, sorting, and client-side routing using browser features.
 
 Data persistence is handled using **localStorage**, so products remain available after page refresh.
